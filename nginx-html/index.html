@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestión de Usuarios y Tareas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --primary: #1976d2;
+      --primary-light: #63a4ff;
+      --background: #f7fafd;
+      --card: #fff;
+      --border: #e3e7ed;
+      --shadow: 0 6px 24px rgba(30, 62, 98, 0.10);
+      --radius: 16px;
+      --space: 1.5rem;
+    }
+    body {
+      font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+      background: var(--background);
+      color: #1a237e;
+      margin: 0;
+      min-height: 100vh;
+    }
+    header {
+      padding: var(--space);
+      background: var(--primary);
+      color: #fff;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(30,62,98,0.07);
+    }
+    main {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2rem 1.5rem 1.5rem 1.5rem;
+      margin-bottom: 2rem;
+      min-width: 0;
+    }
+    h2 {
+      margin-top: 0;
+      margin-bottom: 1.2rem;
+      font-size: 1.4rem;
+      color: var(--primary);
+    }
+    form label {
+      font-size: 1rem;
+      display: block;
+      margin-bottom: 0.2rem;
+      margin-top: 1rem;
+    }
+    form input, form select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      margin-bottom: 0.5rem;
+    }
+    button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-weight: 500;
+      margin-top: 1rem;
+      box-shadow: 0 1px 3px rgba(25,118,210,0.10);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    button:hover, button:focus {
+      background: var(--primary-light);
+    }
+    .result, pre {
+      margin-top: 0.5rem;
+      margin-bottom: 0;
+      background: #f1f7fb;
+      border-radius: 8px;
+      padding: 0.9rem 1.1rem;
+      border: 1px solid #e3e7ed;
+      font-size: 0.96rem;
+      color: #0d47a1;
+      overflow-x: auto;
+      box-shadow: 0 1px 4px rgba(25,118,210,0.06);
+    }
+    @media (max-width: 800px) {
+      main { grid-template-columns: 1fr; gap: 1.5rem;}
+      section { margin-bottom: 1.5rem; }
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #d2d8e3;
+      margin: 2.2rem 0 1.2rem 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Gestión de Usuarios y Tareas</h1>
+    <p>Demo de microservicios - Express, SQLite & Docker Compose</p>
+  </header>
+  <main>
+    <section>
+      <h2>Crear Usuario</h2>
+      <form id="form-crear-user">
+        <label>Email:</label>
+        <input type="email" id="user-email" required />
+        <label>Nombre:</label>
+        <input type="text" id="user-nombre" required />
+        <button type="submit">Crear Usuario</button>
+        <div class="result" id="user-create-result"></div>
+      </form>
+
+      <hr>
+      <h2>Buscar Usuario por ID</h2>
+      <input type="number" id="buscar-user-id" placeholder="ID de usuario">
+      <button onclick="buscarUsuario()">Buscar</button>
+      <pre id="user-found"></pre>
+
+      <hr>
+      <h2>Usuarios Registrados</h2>
+      <button onclick="listarUsuarios()">Listar Usuarios</button>
+      <pre id="users-list"></pre>
+    </section>
+
+    <section>
+      <h2>Crear Tarea</h2>
+      <form id="form-crear-task">
+        <label>Título:</label>
+        <input type="text" id="task-titulo" required />
+        <label>Descripción:</label>
+        <input type="text" id="task-desc" />
+        <label>ID de Usuario:</label>
+        <input type="number" id="task-userId" required />
+        <button type="submit">Crear Tarea</button>
+        <div class="result" id="task-create-result"></div>
+      </form>
+
+      <hr>
+      <h2>Buscar Tarea por ID</h2>
+      <input type="number" id="buscar-task-id" placeholder="ID de tarea">
+      <button onclick="buscarTarea()">Buscar</button>
+      <pre id="task-found"></pre>
+
+      <hr>
+      <h2>Actualizar Estado de Tarea</h2>
+      <input type="number" id="update-task-id" placeholder="ID de tarea">
+      <select id="update-task-estado">
+        <option value="pendiente">Pendiente</option>
+        <option value="en_progreso">En progreso</option>
+        <option value="completada">Completada</option>
+      </select>
+      <button onclick="actualizarEstado()">Actualizar</button>
+      <pre id="task-updated"></pre>
+
+      <hr>
+      <h2>Filtrar Tareas por Usuario</h2>
+      <input type="number" id="filtro-user-id" placeholder="ID de usuario">
+      <button onclick="filtrarTareas()">Filtrar</button>
+      <pre id="tasks-filtered"></pre>
+
+      <hr>
+      <h2>Tareas Registradas</h2>
+      <button onclick="listarTareas()">Listar Tareas</button>
+      <pre id="tasks-list"></pre>
+    </section>
+  </main>
+
+  <script>
+    const API_BASE = "http://localhost:3001";
+    const TASK_API = "http://localhost:3002";
+
+    // Crear Usuario
+    document.getElementById('form-crear-user').onsubmit = async function(e) {
+      e.preventDefault();
+      const email = document.getElementById('user-email').value;
+      const nombre = document.getElementById('user-nombre').value;
+      const res = await fetch(`${API_BASE}/users`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, nombre })
+      });
+      document.getElementById('user-create-result').textContent = await res.text();
+      listarUsuarios();
+    };
+
+    // Listar Usuarios
+    async function listarUsuarios() {
+      const res = await fetch(`${API_BASE}/users`);
+      const data = await res.json();
+      document.getElementById('users-list').textContent = JSON.stringify(data, null, 2);
+    }
+
+    // Buscar Usuario por ID
+    async function buscarUsuario() {
+      const id = document.getElementById('buscar-user-id').value;
+      const res = await fetch(`${API_BASE}/users/${id}`);
+      const data = await res.json();
+      document.getElementById('user-found').textContent = JSON.stringify(data, null, 2);
+    }
+
+    // Crear Tarea
+    document.getElementById('form-crear-task').onsubmit = async function(e) {
+      e.preventDefault();
+      const titulo = document.getElementById('task-titulo').value;
+      const descripcion = document.getElementById('task-desc').value;
+      const userId = Number(document.getElementById('task-userId').value);
+      const res = await fetch(`${TASK_API}/tasks`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ titulo, descripcion, userId })
+      });
+      document.getElementById('task-create-result').textContent = await res.text();
+      listarTareas();
+    };
+
+    // Listar Tareas
+    async function listarTareas() {
+      const res = await fetch(`${TASK_API}/tasks`);
+      const data = await res.json();
+      document.getElementById('tasks-list').textContent = JSON.stringify(data, null, 2);
+    }
+
+    // Buscar Tarea por ID
+    async function buscarTarea() {
+      const id = document.getElementById('buscar-task-id').value;
+      const res = await fetch(`${TASK_API}/tasks/${id}`);
+      const data = await res.json();
+      document.getElementById('task-found').textContent = JSON.stringify(data, null, 2);
+    }
+
+    // Actualizar Estado
+    async function actualizarEstado() {
+      const id = document.getElementById('update-task-id').value;
+      const estado = document.getElementById('update-task-estado').value;
+      const res = await fetch(`${TASK_API}/tasks/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estado })
+      });
+      const data = await res.json();
+      document.getElementById('task-updated').textContent = JSON.stringify(data, null, 2);
+    }
+
+    // Filtrar por usuario
+    // Filtrar por usuario
+  async function filtrarTareas() {
+    const id = document.getElementById('filtro-user-id').value.trim();
+    if (!id) {
+      document.getElementById('tasks-filtered').textContent = "⚠️ Ingresa un ID de usuario válido.";
+      return;
+    }
+
+    const res = await fetch(`${TASK_API}/tasks?user_id=${id}`);
+    const data = await res.json();
+    document.getElementById('tasks-filtered').textContent = JSON.stringify(data, null, 2);
+  }
+
+
+    // Health check (opcional)
+    fetch(`${API_BASE}/health`).then(r => console.log("User-service OK")).catch(() => console.warn("User-service FAIL"));
+    fetch(`${TASK_API}/health`).then(r => console.log("Task-service OK")).catch(() => console.warn("Task-service FAIL"));
+  </script>
+</body>
+</html>
