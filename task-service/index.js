@@ -101,6 +101,9 @@ app.get('/tasks', (req, res) => {
 });
 
 // Health check
-app.get('/health', (req, res) => res.send('OK'));
+app.get('/health', (req, res) => {
+  res.status(200).send('Task Service is healthy');
+});
+
 
 app.listen(PORT, () => console.log(`Task Service running on port ${PORT}`));

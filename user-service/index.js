@@ -50,6 +50,8 @@ app.get('/users/:id', (req, res) => {
   });
 });
 
-app.get('/health', (req, res) => res.send('OK'));
+app.get('/health', (req, res) => {
+  res.status(200).send('User Service is healthy');
+});
 
 app.listen(PORT, () => console.log(`User Service running on port ${PORT}`));
