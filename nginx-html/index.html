@@ -104,6 +104,18 @@
       border-top: 1px solid #d2d8e3;
       margin: 2.2rem 0 1.2rem 0;
     }
+
+    .health-status {
+      margin-top: 1rem;
+      font-weight: bold;
+      color: #1976d2;
+    }
+    .healthy {
+      color: green;
+    }
+    .unhealthy {
+      color: red;
+    }
   </style>
 </head>
 <body>
@@ -175,6 +187,12 @@
       <h2>Tareas Registradas</h2>
       <button onclick="listarTareas()">Listar Tareas</button>
       <pre id="tasks-list"></pre>
+    </section>
+
+    <section>
+      <h2>Estado de los Servicios</h2>
+      <div id="health-user-service" class="health-status">User Service: <span id="user-service-status">Cargando...</span></div>
+      <div id="health-task-service" class="health-status">Task Service: <span id="task-service-status">Cargando...</span></div>
     </section>
   </main>
 
@@ -255,23 +273,51 @@
     }
 
     // Filtrar por usuario
-    // Filtrar por usuario
-  async function filtrarTareas() {
-    const id = document.getElementById('filtro-user-id').value.trim();
-    if (!id) {
-      document.getElementById('tasks-filtered').textContent = "⚠️ Ingresa un ID de usuario válido.";
-      return;
+    async function filtrarTareas() {
+      const id = document.getElementById('filtro-user-id').value.trim();
+      if (!id) {
+        document.getElementById('tasks-filtered').textContent = "⚠️ Ingresa un ID de usuario válido.";
+        return;
+      }
+
+      const res = await fetch(`${TASK_API}/tasks?user_id=${id}`);
+      const data = await res.json();
+      document.getElementById('tasks-filtered').textContent = JSON.stringify(data, null, 2);
     }
 
-    const res = await fetch(`${TASK_API}/tasks?user_id=${id}`);
-    const data = await res.json();
-    document.getElementById('tasks-filtered').textContent = JSON.stringify(data, null, 2);
-  }
-
-
     // Health check (opcional)
-    fetch(`${API_BASE}/health`).then(r => console.log("User-service OK")).catch(() => console.warn("User-service FAIL"));
-    fetch(`${TASK_API}/health`).then(r => console.log("Task-service OK")).catch(() => console.warn("Task-service FAIL"));
+    async function healthCheck() {
+      try {
+        const userServiceRes = await fetch(`${API_BASE}/health`);
+        const taskServiceRes = await fetch(`${TASK_API}/health`);
+        
+        // Verificar el estado de los servicios
+        if (userServiceRes.ok) {
+          document.getElementById('user-service-status').textContent = 'Healthy';
+          document.getElementById('user-service-status').classList.add('healthy');
+        } else {
+          document.getElementById('user-service-status').textContent = 'Unhealthy';
+          document.getElementById('user-service-status').classList.add('unhealthy');
+        }
+
+        if (taskServiceRes.ok) {
+          document.getElementById('task-service-status').textContent = 'Healthy';
+          document.getElementById('task-service-status').classList.add('healthy');
+        } else {
+          document.getElementById('task-service-status').textContent = 'Unhealthy';
+          document.getElementById('task-service-status').classList.add('unhealthy');
+        }
+      } catch (error) {
+        document.getElementById('user-service-status').textContent = 'Unhealthy';
+        document.getElementById('user-service-status').classList.add('unhealthy');
+        document.getElementById('task-service-status').textContent = 'Unhealthy';
+        document.getElementById('task-service-status').classList.add('unhealthy');
+      }
+    }
+
+    // Ejecutar health check al cargar la página
+    healthCheck();
   </script>
 </body>
 </html>
+
