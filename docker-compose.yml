@@ -54,7 +54,7 @@ services:
     volumes:
       - ./nginx-html:/usr/share/nginx/html:ro
     expose:
-      - "88"
+      - "80"
     networks:
       - backend
     healthcheck:
