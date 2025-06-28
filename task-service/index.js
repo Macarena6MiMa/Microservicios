@@ -1,7 +1,6 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
-const fetch = require('node-fetch'); // Si no está, asegúrate de instalarlo
 const app = express();
 const PORT = 3002;
 
@@ -26,7 +25,7 @@ db.run(`CREATE TABLE IF NOT EXISTS tasks (
 // Validar usuario con user-service
 async function validarUsuario(userId) {
   try {
-    const url = `https://my-to-do.online/api/users/:${userId}`;
+    const url = `https://my-to-do.online/api/users/${userId}`;
     const resp = await fetch(url);
     console.log(`[TaskService] Validando usuario: GET ${url} → status: ${resp.status}`);
     return resp.ok;
