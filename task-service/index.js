@@ -103,7 +103,7 @@ taskRouter.get('/', (req, res) => {
 app.use('/api/tasks', taskRouter);
 
 // Health check
-app.get('/health', (req, res) => {
+taskRouter.get('/health', (req, res) => {
   res.status(200).send('Task Service is healthy');
 });
 app.listen(PORT, () => console.log(`Task Service running on port ${PORT}`));

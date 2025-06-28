@@ -58,7 +58,7 @@ userRouter.get('/:id', (req, res) => {
 app.use('/api/users', userRouter);
 
 // Health check
-app.get('/health', (req, res) => {
+userRouter.get('/health', (req, res) => {
   res.status(200).send('User Service is healthy');
 });
 
