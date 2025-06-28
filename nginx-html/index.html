@@ -289,8 +289,7 @@
     async function healthCheck() {
       try {
         const userServiceRes = await fetch(`${API_BASE}/health`);
-        const taskServiceRes = await fetch("https://my-to-do.online/api/tasks/health");
-
+        const taskServiceRes = await fetch(`${TASK_API}/health`);
         
         // Verificar el estado de los servicios
         if (userServiceRes.ok) {
