@@ -55,7 +55,7 @@ userRouter.get('/:id', (req, res) => {
 });
 
 // Registrar el prefijo /api/user
-app.use('/api/user', userRouter);
+app.use('/api/users', userRouter);
 
 // Health check
 app.get('/health', (req, res) => {

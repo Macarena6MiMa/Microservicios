@@ -100,7 +100,7 @@ taskRouter.get('/', (req, res) => {
 });
 
 // === Registrar router con prefijo /api/task ===
-app.use('/api/task', taskRouter);
+app.use('/api/tasks', taskRouter);
 
 // Health check
 app.get('/health', (req, res) => {
