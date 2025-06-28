@@ -99,11 +99,13 @@ taskRouter.get('/', (req, res) => {
   }
 });
 
-// === Registrar router con prefijo /api/task ===
-app.use('/api/tasks', taskRouter);
-
 // Health check
 taskRouter.get('/health', (req, res) => {
   res.status(200).send('Task Service is healthy');
 });
+
+
+// === Registrar router con prefijo /api/task ===
+app.use('/api/tasks', taskRouter);
+
 app.listen(PORT, () => console.log(`Task Service running on port ${PORT}`));
