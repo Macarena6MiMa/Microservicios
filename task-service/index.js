@@ -99,7 +99,7 @@ taskRouter.get('/', (req, res) => {
 });
 
 // Health check
-app.get('tasks/health', (req, res) => {
+app.get('/api/tasks/health', (req, res) => {
   res.status(200).send('Task Service is healthy');
 });
 
