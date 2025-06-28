@@ -4,7 +4,6 @@ const cors = require('cors');
 const app = express();
 const PORT = 3001;
 
-// Middleware
 app.use(express.json());
 app.use(cors());
 
@@ -21,8 +20,11 @@ db.run(`CREATE TABLE IF NOT EXISTS users (
   nombre TEXT NOT NULL
 );`);
 
-// Endpoints
-app.post('/users', (req, res) => {
+// === ROUTER para /api/user ===
+const userRouter = express.Router();
+
+// Crear nuevo usuario
+userRouter.post('/', (req, res) => {
   const { email, nombre } = req.body;
   if (!email || !nombre) return res.status(400).json({ error: 'Campos obligatorios' });
   db.run(
@@ -35,14 +37,16 @@ app.post('/users', (req, res) => {
   );
 });
 
-app.get('/users', (req, res) => {
+// Listar todos los usuarios
+userRouter.get('/', (req, res) => {
   db.all('SELECT * FROM users', [], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
   });
 });
 
-app.get('/users/:id', (req, res) => {
+// Obtener usuario por ID
+userRouter.get('/:id', (req, res) => {
   db.get('SELECT * FROM users WHERE id = ?', [req.params.id], (err, row) => {
     if (err) return res.status(500).json({ error: err.message });
     if (!row) return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -50,6 +54,10 @@ app.get('/users/:id', (req, res) => {
   });
 });
 
+// Registrar el prefijo /api/user
+app.use('/api/user', userRouter);
+
+// Health check
 app.get('/health', (req, res) => {
   res.status(200).send('User Service is healthy');
 });

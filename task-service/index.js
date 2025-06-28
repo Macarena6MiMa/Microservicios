@@ -1,6 +1,7 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
+const fetch = require('node-fetch'); // Si no está, asegúrate de instalarlo
 const app = express();
 const PORT = 3002;
 
@@ -22,7 +23,7 @@ db.run(`CREATE TABLE IF NOT EXISTS tasks (
   userId INTEGER NOT NULL
 );`);
 
-// Función para validar usuario con user-service
+// Validar usuario con user-service
 async function validarUsuario(userId) {
   try {
     const url = `http://user-service:3001/users/${userId}`;
@@ -35,12 +36,11 @@ async function validarUsuario(userId) {
   }
 }
 
-
-
-// Endpoints
+// === ROUTER con prefijo /api/task ===
+const taskRouter = express.Router();
 
 // Crear nueva tarea
-app.post('/tasks', async (req, res) => {
+taskRouter.post('/', async (req, res) => {
   const { titulo, descripcion, userId } = req.body;
   if (!titulo || !userId) return res.status(400).json({ error: 'Faltan campos obligatorios' });
 
@@ -57,9 +57,8 @@ app.post('/tasks', async (req, res) => {
   );
 });
 
-
 // Obtener tarea específica
-app.get('/tasks/:id', (req, res) => {
+taskRouter.get('/:id', (req, res) => {
   db.get('SELECT * FROM tasks WHERE id = ?', [req.params.id], (err, row) => {
     if (err) return res.status(500).json({ error: err.message });
     if (!row) return res.status(404).json({ error: 'Tarea no encontrada' });
@@ -68,7 +67,7 @@ app.get('/tasks/:id', (req, res) => {
 });
 
 // Actualizar estado de una tarea
-app.put('/tasks/:id', (req, res) => {
+taskRouter.put('/:id', (req, res) => {
   const { estado } = req.body;
   if (!['pendiente', 'en_progreso', 'completada'].includes(estado)) {
     return res.status(400).json({ error: 'Estado no válido' });
@@ -84,8 +83,8 @@ app.put('/tasks/:id', (req, res) => {
   );
 });
 
-// Filtrar tareas por usuario
-app.get('/tasks', (req, res) => {
+// Filtrar o listar tareas
+taskRouter.get('/', (req, res) => {
   const { user_id } = req.query;
   if (user_id) {
     db.all('SELECT * FROM tasks WHERE userId = ?', [user_id], (err, rows) => {
@@ -100,10 +99,11 @@ app.get('/tasks', (req, res) => {
   }
 });
 
+// === Registrar router con prefijo /api/task ===
+app.use('/api/task', taskRouter);
+
 // Health check
 app.get('/health', (req, res) => {
   res.status(200).send('Task Service is healthy');
 });
-
-
 app.listen(PORT, () => console.log(`Task Service running on port ${PORT}`));
