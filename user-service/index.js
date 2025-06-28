@@ -54,12 +54,11 @@ userRouter.get('/:id', (req, res) => {
   });
 });
 
-// Registrar el prefijo /api/user
-app.use('/api/users', userRouter);
-
 // Health check
 app.get('/api/users/health', (req, res) => {
   res.status(200).send('User Service is healthy');
 });
+// Registrar el prefijo /api/user
+app.use('/api/users', userRouter);
 
 app.listen(PORT, () => console.log(`User Service running on port ${PORT}`));
