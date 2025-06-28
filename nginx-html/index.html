@@ -104,6 +104,7 @@
       border-top: 1px solid #d2d8e3;
       margin: 2.2rem 0 1.2rem 0;
     }
+
     .health-status {
       margin-top: 1rem;
       font-weight: bold;
@@ -196,14 +197,15 @@
   </main>
 
   <script>
-    const API_BASE = "https://my-to-do.online/api/users";
-    const TASK_API = "https://my-to-do.online/api/tasks";
+    const API_BASE = "http://my-to-do.online:3001";
+    const TASK_API = "http://my-to-do.online:3002";
 
+    // Crear Usuario
     document.getElementById('form-crear-user').onsubmit = async function(e) {
       e.preventDefault();
       const email = document.getElementById('user-email').value;
       const nombre = document.getElementById('user-nombre').value;
-      const res = await fetch(`${API_BASE}`, {
+      const res = await fetch(`${API_BASE}/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, nombre })
@@ -212,25 +214,28 @@
       listarUsuarios();
     };
 
+    // Listar Usuarios
     async function listarUsuarios() {
-      const res = await fetch(`${API_BASE}`);
+      const res = await fetch(`${API_BASE}/users`);
       const data = await res.json();
       document.getElementById('users-list').textContent = JSON.stringify(data, null, 2);
     }
 
+    // Buscar Usuario por ID
     async function buscarUsuario() {
       const id = document.getElementById('buscar-user-id').value;
-      const res = await fetch(`${API_BASE}/${id}`);
+      const res = await fetch(`${API_BASE}/users/${id}`);
       const data = await res.json();
       document.getElementById('user-found').textContent = JSON.stringify(data, null, 2);
     }
 
+    // Crear Tarea
     document.getElementById('form-crear-task').onsubmit = async function(e) {
       e.preventDefault();
       const titulo = document.getElementById('task-titulo').value;
       const descripcion = document.getElementById('task-desc').value;
       const userId = Number(document.getElementById('task-userId').value);
-      const res = await fetch(`${TASK_API}`, {
+      const res = await fetch(`${TASK_API}/tasks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ titulo, descripcion, userId })
@@ -239,23 +244,26 @@
       listarTareas();
     };
 
+    // Listar Tareas
     async function listarTareas() {
-      const res = await fetch(`${TASK_API}`);
+      const res = await fetch(`${TASK_API}/tasks`);
       const data = await res.json();
       document.getElementById('tasks-list').textContent = JSON.stringify(data, null, 2);
     }
 
+    // Buscar Tarea por ID
     async function buscarTarea() {
       const id = document.getElementById('buscar-task-id').value;
-      const res = await fetch(`${TASK_API}/${id}`);
+      const res = await fetch(`${TASK_API}/tasks/${id}`);
       const data = await res.json();
       document.getElementById('task-found').textContent = JSON.stringify(data, null, 2);
     }
 
+    // Actualizar Estado
     async function actualizarEstado() {
       const id = document.getElementById('update-task-id').value;
       const estado = document.getElementById('update-task-estado').value;
-      const res = await fetch(`${TASK_API}/${id}`, {
+      const res = await fetch(`${TASK_API}/tasks/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ estado })
@@ -264,22 +272,26 @@
       document.getElementById('task-updated').textContent = JSON.stringify(data, null, 2);
     }
 
+    // Filtrar por usuario
     async function filtrarTareas() {
       const id = document.getElementById('filtro-user-id').value.trim();
       if (!id) {
         document.getElementById('tasks-filtered').textContent = "⚠️ Ingresa un ID de usuario válido.";
         return;
       }
-      const res = await fetch(`${TASK_API}?user_id=${id}`);
+
+      const res = await fetch(`${TASK_API}/tasks?user_id=${id}`);
       const data = await res.json();
       document.getElementById('tasks-filtered').textContent = JSON.stringify(data, null, 2);
     }
 
+    // Health check (opcional)
     async function healthCheck() {
       try {
         const userServiceRes = await fetch(`${API_BASE}/health`);
         const taskServiceRes = await fetch(`${TASK_API}/health`);
-
+        
+        // Verificar el estado de los servicios
         if (userServiceRes.ok) {
           document.getElementById('user-service-status').textContent = 'Healthy';
           document.getElementById('user-service-status').classList.add('healthy');
@@ -303,7 +315,9 @@
       }
     }
 
+    // Ejecutar health check al cargar la página
     healthCheck();
   </script>
 </body>
 </html>
+
