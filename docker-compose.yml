@@ -3,7 +3,7 @@ version: "3.8"
 services:
   user-service:
     build: ./user-service
-    ports:
+    expose:
       - "3001"
     volumes:
       - ./shared-db:/db
@@ -17,7 +17,7 @@ services:
 
   task-service:
     build: ./task-service
-    ports:
+    expose:
       - "3002"
     volumes:
       - ./shared-db:/db
