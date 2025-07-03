@@ -3,8 +3,8 @@ version: "3.8"
 services:
   user-service:
     build: ./user-service
-    expose:
-      - "3001"
+    ports:
+      - "3001:3001"
     volumes:
       - ./shared-db:/db
     networks:
@@ -17,8 +17,8 @@ services:
 
   task-service:
     build: ./task-service
-    expose:
-      - "3002"
+    ports:
+      - "3002:3002"
     volumes:
       - ./shared-db:/db
     networks:
@@ -40,6 +40,7 @@ services:
       - task-service
     networks:
       - backend
+
 
   nginx-proxy-manager:
     image: jc21/nginx-proxy-manager:latest
