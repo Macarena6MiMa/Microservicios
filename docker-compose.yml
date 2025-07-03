@@ -28,6 +28,19 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+  nginx-proxy:
+    image: nginx:alpine
+    ports:
+      - "8088:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx-html:/usr/share/nginx/html:ro  # si sirves frontend
+    depends_on:
+      - user-service
+      - task-service
+    networks:
+      - backend
+
 
   nginx-proxy-manager:
     image: jc21/nginx-proxy-manager:latest
